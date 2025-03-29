@@ -14,9 +14,9 @@ class Task(Base):
     isCompleted = Column(Boolean, default=False)
 
      # Foreign key to associate with a user
-    # user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
 
-    # user = relationship("User", back_populates="tasks")
+    user = relationship("User", back_populates="tasks")
 
     def __repr__(self) -> str:
         return f"Task(id={self.id}, task_name={self.task_name})"
