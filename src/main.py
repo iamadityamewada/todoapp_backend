@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(
     title="Taskimise",
     version="1.0.0",
-    docs_url="/taskimise-service/docs",  # Custom path for Swagger documentation
+    docs_url="/docs",  # Custom path for Swagger documentation
 )
 
 app.add_middleware(

@@ -9,30 +9,32 @@ from sqlalchemy import or_, and_, func
 from fastapi.encoders import jsonable_encoder
 
 class TaskServices:
-    def create_task(self, request, data,db):
+    def create_task(self, request, data, db, current_user):
         try:
-            new_task = Task(**dict(data))
+            # print("current user", current_user)
+            new_task = Task(**dict(data),user_id = current_user)
             db.add(new_task)
             db.commit()
             db.refresh(new_task)
-            return send_success(200,content=f"Task Created {new_task} ")
-        except:
+            return send_success(status_code = 201,content=f"Task Created {new_task} ")
+        except Exception as e:
+            print("create task error : ", e)
             return send_error()
         
 
 
-    def get_task(self, request, db):
+    def get_task(self, request, db, current_user):
         try:
             tasks = db.query(Task).all()
             return send_success(status_code=200, content= tasks)
         
         except Exception as e:
             print(f"Error fetching tasks: {e}")
-            return send_error(message="Failed to fetch tasks", content=str(e))
+            return send_error(500,message="Failed to fetch tasks", content=str(e))
 
 
       
-    def delete_task(self, request, id, db):
+    def delete_task(self, request, id, db, current_user):
         try:
             task = db.query(Task).filter(Task.id == id).first()
             if not task:
@@ -45,15 +47,16 @@ class TaskServices:
             return send_error(message="Failed to delete task", content=str(e))  
 
 
-    def update_task(self, request, data,id, db):
+    def update_task(self, request, data,id, db, current_user):
         try:
             task = db.query(Task).filter(Task.id == id).first()
             if not task:
                 return send_error(404, "Task not found")
             task.task_name = data.task_name
+            task.task_desc = data.task_desc
             task.start_date = data.start_date
             task.end_date = data.end_date
-            task.isCompleted = data.isCompleted
+            task.is_completed = data.is_completed
             db.commit()
             db.refresh(task)
             return send_success(200, content=f"Task Updated{task}")
@@ -62,12 +65,13 @@ class TaskServices:
             return send_error(message="Failed to update task", content=str(e))
 
 
-    def filter_tasks(self, request: Request, db: Session, 
+    def filter_tasks(self, request, db ,current_user,
         id: Optional[int] = None,
         task_name: Optional[str] = None, 
         isCompleted: Optional[bool] = None, 
         start_date: Optional[datetime] = None, 
-        end_date: Optional[datetime] = None):
+        end_date: Optional[datetime] = None,
+        ):
         try:
             query = db.query(Task)
             if id:

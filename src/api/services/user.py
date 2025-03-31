@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from src.models.user import User
 from src.middleware.custom_response import send_error, send_success
-from src.dtos.user import UserCreate
 from src.core.security import get_password_hash, verify_password, create_access_token
 
 class UserServices:
@@ -27,17 +26,18 @@ class UserServices:
                 user = db.query(User).filter(User.username == data.username).first()
 
                 if not user:
-                      return send_error(status_code=404)
+                      return send_error(status_code=404,message= "user not found", content=["username may be not correct"])
                 
                 if not verify_password(data.password, user.password):
-                      return send_error(status_code=401)
+                      return send_error(status_code=401,message="Incorrect Password",content=[user.password])
                 
-                access_token = create_access_token(data={"sub": user.id})
+                access_token = create_access_token(data={"sub": str(user.id)})
 
-                return send_success(status_code=200, content=[{"access_token":access_token}, {"token_type": "bearer"}])
+            #     return send_success(content={"access_token":access_token, "token_type": "bearer"})
+                return {"access_token":access_token, "token_type": "bearer"}
           except Exception as e:
                 print("Error in Login :", e)
-                return send_error(status_code=500)       
+                return send_error(status_code=500)      
 
     # def authenticate_user(db: Session, username: str, password: str):
     #     try:
