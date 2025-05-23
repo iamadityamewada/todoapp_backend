@@ -34,16 +34,9 @@ class UserServices:
                 access_token = create_access_token(data={"sub": str(user.id)})
 
             #     return send_success(content={"access_token":access_token, "token_type": "bearer"})
-                return {"access_token":access_token, "token_type": "bearer"}
+                return send_success(status_code=200, message="ok", content={"access_token":access_token, "token_type": "bearer"})
           except Exception as e:
                 print("Error in Login :", e)
                 return send_error(status_code=500)      
 
-    # def authenticate_user(db: Session, username: str, password: str):
-    #     try:
-    #         user = db.query(User).filter(User.username == username).first()
-    #         if not user or not verify_password(password, user.hashed_password):
-    #             return False
-    #         return user 
-    #     except:
-    #          send_error() 
+

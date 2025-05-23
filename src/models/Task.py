@@ -9,6 +9,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True, index=True)
     task_name = Column(String(255), nullable=False, index=True)
     task_desc = Column(String, nullable=False)
+    priority = Column(String(10), nullable=False, default= "low")
     start_date = Column(Date, nullable=False)  
     end_date = Column(Date, nullable=False)
     is_completed = Column(Boolean, default=False)
